@@ -8,16 +8,15 @@ public class Genome {
 	private float mutateRate;
 
 	//constructor for first random genotype by length
-	public Genome(int length){
+	public Genome(int length, int randomSeed){
 
 		genes = new char[length];
-        GenerateRandomGenome(length);
+        GenerateRandomGenome(length, randomSeed);
 	}
 
- 
-    public void GenerateRandomGenome(int length)
+    public void GenerateRandomGenome(int length, int randomSeed)
     {
-        System.Random randomInt = new System.Random();
+        System.Random randomInt = new System.Random(randomSeed);
 
         //generate a new random genome with genes a-z
         for (int i = 0; i < length; i++)

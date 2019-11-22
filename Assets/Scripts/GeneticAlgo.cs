@@ -25,10 +25,11 @@ public class Population
     public void Seed(string targetString)
     {
         _genomes = new Genome[_size];
+        System.Random randomInt = new System.Random();
 
         for (int i = 0; i < _size; i++)
         {
-            _genomes[i] = new Genome(targetString.Length);
+            _genomes[i] = new Genome(targetString.Length, randomInt.Next());
         }
         _generation++;
     }
@@ -151,8 +152,7 @@ public class Selection
                 //must have 5 selections.....
                 for (int i = 0; i < 5; i++)
                 {
-                    Debug.Log("User chose " + indices[i]);
-                    Debug.Log("This genome is " + p._genomes[int.Parse(indices[i])].ToString());
+                    Debug.Log("User chose Genome " + indices[i] + "\nGenome : " + p._genomes[int.Parse(indices[i])].ToString());
 
                     for (int j = 0; j < (size / 5); j++)
                     {
@@ -418,14 +418,14 @@ public class GeneticAlgo
 
     public void NextGeneration(string userSelection = "")
     {
-
         //at the end of each run the  user selects N items, these are uniformly spread in the need population
         //this is then passed to the selection
         //need to fix random choice bit.
         //should i save each generation in the population object
         //I need to after each generation wait.
         //allow flipping between user selection and other modes
-
+        //targetstring is blank
+        //make genome more generic, and specifiable
 
         //in god mode the user acts as the fitness function, so we don't need a fitness.
         List<Genome> parentSelection;

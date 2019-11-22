@@ -9,7 +9,8 @@ public class Main : MonoBehaviour {
     private Color[][] images;
     GeneticAlgo geneticAlgo;
     Text textGeneration, textScore0, textEvolve, textReset;
-    string inputSelection;
+    InputField iField;
+    public string inputSelection;
     public int width;
     public int height;
 
@@ -31,7 +32,7 @@ public class Main : MonoBehaviour {
         textScore0 = GameObject.Find("TextScore0").GetComponent<Text>();
         textEvolve = GameObject.Find("TextEvolve").GetComponent<Text>();
         textReset = GameObject.Find("TextReset").GetComponent<Text>();
-        inputSelection = GameObject.Find("InputSelection").GetComponent<InputField>().text;
+        iField = GameObject.Find("InputSelection").GetComponent<InputField>();
 
         textReset.text = "Reset";
 
@@ -58,6 +59,7 @@ public class Main : MonoBehaviour {
 
         //sets the last random image as the target image for now.....
         string target = colorsToString(images[noiseCount - 1]);
+        GetInput();
         startEvo(target);
 
         //how to improve evo, the random in new genomes is not changing, the equals thing where the same, parse the inputs!!!!!!
@@ -140,6 +142,10 @@ public class Main : MonoBehaviour {
         Application.Quit();
     }
 
+    public void GetInput(){
+        inputSelection = iField.text;
+    }
+
     // Update is called once per frame
     void Update () {
 
@@ -149,9 +155,9 @@ public class Main : MonoBehaviour {
             finalOutput = geneticAlgo.ToString();
             geneticAlgo.NextGeneration(inputSelection);
             enable = false;
+            GetInput();
             textEvolve.text = "Evolve";
             Debug.Log(finalOutput);
-
 
             //get the top 5 candidates from this generations genomes
             for (int i = 0; i < 5; i++)
