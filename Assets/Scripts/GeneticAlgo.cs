@@ -148,6 +148,7 @@ public class Selection
                 Debug.Log("Please choose the candidates selected to be the parents");
                 Debug.Log("Type 5 numbers between 0 and " + (p._size - 1).ToString());
                 string[] indices = userSelection.Split(' ');
+                Debug.Log(indices.Length);
 
                 //must have 5 selections.....
                 for (int i = 0; i < 5; i++)

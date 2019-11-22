@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using System.Linq;
 
 
 
@@ -76,12 +77,23 @@ public class Main : MonoBehaviour {
         GetInput();
         startEvo(target);
 
+        //need to draw the images after the initial population has been generated
+
         //how to improve evo, the random in new genomes is not changing, the equals thing where the same, parse the inputs!!!!!!
     }
 
-    public void OnClickButton(string go)
+    public void OnClickButton(string rawSelectionNum)
     {
-        iField.text = go;
+        iField.text = rawSelectionNum.Substring(3).ToString() + " " + iField.text;
+        CheckInputCount();
+    }
+
+    //ensures that the number of entries in the input field is 5
+    public void CheckInputCount()
+    {
+        string[] inputs = iField.text.Split(' ');
+        string[] checkedInputs = inputs.Length > 5 ? inputs.Take(5).ToArray() : inputs;
+        iField.text = string.Join(" ", checkedInputs);
     }
 
     public string colorsToString(Color[] pixels)
@@ -116,7 +128,7 @@ public class Main : MonoBehaviour {
 
     public void startEvo(string target)
     {
-        string selectType = "truncated";
+        string selectType = "god mode";
         string mutateType = "randomChoice";
         string crossType = "OnePt";
 
@@ -154,18 +166,12 @@ public class Main : MonoBehaviour {
     }
 
     //button to quit app
-    public void OnClickExit()
-    {
+    public void OnClickExit(){
         Application.Quit();
     }
 
     public void GetInput(){
         inputSelection = iField.text;
-    }
-
-    public void RawImageOnClick()
-    {
-        Debug.Log("testtttt");
     }
 
     // Update is called once per frame
@@ -177,6 +183,35 @@ public class Main : MonoBehaviour {
         else{
             UpdateFitness();
         }
+        }
+
+    }
+
+    //update function for user selection based algorithm
+    public void UpdateUser()
+    {
+
+        if (enable)
+        {
+            GetInput();
+            string finalOutput = "";
+            finalOutput = geneticAlgo.ToString();
+            geneticAlgo.NextGeneration(inputSelection);
+            enable = false; //pausing the simulation to get new data
+            textEvolve.text = "Evolve";
+            Debug.Log(finalOutput);
+
+            //get the first 5 candidates from this generations genomes
+            for (int i = 0; i < rawCount; i++)
+            {
+                string scoreNum = "TextScore" + i.ToString();
+                string rawNum = "Raw" + i.ToString();
+                Color[] test = stringToColors(geneticAlgo.Population._genomes[i].genome);
+                RawImage raw = GameObject.Find(rawNum).GetComponent<RawImage>();
+                //Text score = GameObject.Find(scoreNum).GetComponent<Text>();
+                TextureDisplay.applyTexture(test, raw, width, height);
+            }
+            textGeneration.text = "Generation : " + geneticAlgo.Population._generation.ToString();
         }
 
     }
@@ -223,33 +258,6 @@ public class Main : MonoBehaviour {
         }
     }
 
-    //update function for user selection based algorithm
-    public void UpdateUser(){
-    
-      if (enable)
-        {
-            string finalOutput = "";
-            finalOutput = geneticAlgo.ToString();
-            geneticAlgo.NextGeneration(inputSelection);
-            enable = false;
-            GetInput();
-            textEvolve.text = "Evolve";
-            Debug.Log(finalOutput);
-
-            //get the first 5 candidates from this generations genomes
-            for (int i = 0; i < 5; i++)
-            {
-                string scoreNum = "TextScore" + i.ToString();
-                string rawNum = "Raw" + i.ToString();
-                Color[] test = stringToColors(geneticAlgo.Population._genomes[i].genome);
-                RawImage raw = GameObject.Find(rawNum).GetComponent<RawImage>();
-                Text score = GameObject.Find(scoreNum).GetComponent<Text>();
-                TextureDisplay.applyTexture(test, raw, width, height);
-            }
-            textGeneration.text = "Generation : " + geneticAlgo.Population._generation.ToString();
-        } 
-   
-    }
 
 
 
