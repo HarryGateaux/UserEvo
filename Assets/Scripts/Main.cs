@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
+
+
 
 public class Main : MonoBehaviour {
 
@@ -46,10 +49,20 @@ public class Main : MonoBehaviour {
             System.Random r = new System.Random(i + Time.frameCount);
             images[i] = TextureNoise.CreateNoise(width, height, r);
         }
-        //applies the images to the rawImages in GUI
+        //applies the images to the rawImages in GUI and add click handler to raw images
         for (int i = 0; i < rawCount; i++)
         {
             TextureDisplay.applyTexture(images[i], rawImages[i], width, height);
+            rawImages[i].gameObject.AddComponent<Button>();
+            Button btn = rawImages[i].gameObject.GetComponent<Button>();
+            string txt = rawImages[i].gameObject.name;
+
+            btn.onClick.AddListener(() => OnClickButton(txt));
+            btn.transition = Selectable.Transition.ColorTint;
+
+            ColorBlock cb = rawImages[i].gameObject.GetComponent<Button>().colors;
+            cb.pressedColor = new Color(0.2f, 0.2f, 0.2f);
+            btn.colors = cb;
         }
 
         //RawImage rawTarget = GameObject.Find("RawTarget").GetComponent<RawImage>();
@@ -64,6 +77,11 @@ public class Main : MonoBehaviour {
         startEvo(target);
 
         //how to improve evo, the random in new genomes is not changing, the equals thing where the same, parse the inputs!!!!!!
+    }
+
+    public void OnClickButton(string go)
+    {
+        iField.text = go;
     }
 
     public string colorsToString(Color[] pixels)
@@ -145,7 +163,12 @@ public class Main : MonoBehaviour {
         inputSelection = iField.text;
     }
 
-     // Update is called once per frame
+    public void RawImageOnClick()
+    {
+        Debug.Log("testtttt");
+    }
+
+    // Update is called once per frame
     void Update () {
         if(enable){
         if(geneticAlgo.Selection._selectionType == "god mode"){
