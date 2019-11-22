@@ -395,7 +395,7 @@ public class Mutation
 public class GeneticAlgo
 {
     private Fitness _fitness;
-    private Selection _selection;
+
     private CrossOver _crossover;
     private Mutation _mutation;
     public string _name;
@@ -405,6 +405,13 @@ public class GeneticAlgo
     {
         get  {return _population;}
         set  {_population = value;}
+    }
+
+    private Selection _selection;
+        public Selection Selection
+    {
+        get  {return _selection;}
+        set  {_selection = value;}
     }
 
     public GeneticAlgo(Fitness fitness, Population population, Selection selection, CrossOver crossover, Mutation mutation)
@@ -418,24 +425,19 @@ public class GeneticAlgo
 
     public void NextGeneration(string userSelection = "")
     {
-        //at the end of each run the  user selects N items, these are uniformly spread in the need population
+        //at the end of each run the  user selects N items
         //this is then passed to the selection
-        //need to fix random choice bit.
         //should i save each generation in the population object
-        //I need to after each generation wait.
-        //allow flipping between user selection and other modes
         //targetstring is blank
         //make genome more generic, and specifiable
-
+        //sort out GUI , 20 items
         //in god mode the user acts as the fitness function, so we don't need a fitness.
-        List<Genome> parentSelection;
-
         if (!(_selection._selectionType == "god mode"))
         {
             _fitness.Apply(Population);
         }
 
-        parentSelection = _selection.Select(Population, userSelection);
+        List<Genome>parentSelection = _selection.Select(Population, userSelection);
         _crossover.Apply(Population, parentSelection);
         _mutation.Apply(Population);
         Population._generation++;

@@ -13,6 +13,7 @@ public class Main : MonoBehaviour {
     public string inputSelection;
     public int width;
     public int height;
+    public int rawCount = 20;
 
     public bool enable;
 
@@ -23,13 +24,13 @@ public class Main : MonoBehaviour {
 
     public void Run()
     {
+        enable = false;
         width = 8;
         height = 8;
-        enable = false;
 
         RawImage[] rawImages = GetComponentsInChildren<RawImage>();
         textGeneration = GameObject.Find("TextGeneration").GetComponent<Text>();
-        textScore0 = GameObject.Find("TextScore0").GetComponent<Text>();
+        //textScore0 = GameObject.Find("TextScore0").GetComponent<Text>();
         textEvolve = GameObject.Find("TextEvolve").GetComponent<Text>();
         textReset = GameObject.Find("TextReset").GetComponent<Text>();
         iField = GameObject.Find("InputSelection").GetComponent<InputField>();
@@ -46,13 +47,13 @@ public class Main : MonoBehaviour {
             images[i] = TextureNoise.CreateNoise(width, height, r);
         }
         //applies the images to the rawImages in GUI
-        for (int i = 0; i < 5; i++)
+        for (int i = 0; i < rawCount; i++)
         {
             TextureDisplay.applyTexture(images[i], rawImages[i], width, height);
         }
 
-        RawImage rawTarget = GameObject.Find("RawTarget").GetComponent<RawImage>();
-        TextureDisplay.applyTexture(images[noiseCount - 1], rawTarget, width, height);
+        //RawImage rawTarget = GameObject.Find("RawTarget").GetComponent<RawImage>();
+        //TextureDisplay.applyTexture(images[noiseCount - 1], rawTarget, width, height);
 
         //currently my images take  values 0.0, 0.1, ...... 0.9
         //i should remap these numbers to a letters from a to...
@@ -97,20 +98,18 @@ public class Main : MonoBehaviour {
 
     public void startEvo(string target)
     {
-        string selectType = "god mode";
+        string selectType = "truncated";
         string mutateType = "randomChoice";
         string crossType = "OnePt";
 
         Fitness fitness = new Fitness(target);
-        Population population = new Population(5000, fitness._targetString) { _name = "images" };
+        Population population = new Population(20, fitness._targetString) { _name = "images" };
         Selection selection = new Selection(selectType);
         CrossOver crossover = new CrossOver(crossType);
         Mutation mutation = new Mutation(mutateType);
 
         geneticAlgo = new GeneticAlgo(fitness, population, selection, crossover, mutation) ;
     }
-
-
 
     public void OnClickEvolve()
     {
@@ -146,10 +145,65 @@ public class Main : MonoBehaviour {
         inputSelection = iField.text;
     }
 
-    // Update is called once per frame
+     // Update is called once per frame
     void Update () {
+        if(enable){
+        if(geneticAlgo.Selection._selectionType == "god mode"){
+            UpdateUser();
+        }
+        else{
+            UpdateFitness();
+        }
+        }
 
+    }
+
+
+    //update function for fitness based algorithm
+    public void UpdateFitness(){
+    
         if (enable && geneticAlgo.Population._bestFitness < 64 && Time.frameCount < 10000)
+        {
+            string finalOutput = "";
+            finalOutput = geneticAlgo.ToString();
+            geneticAlgo.NextGeneration(inputSelection);
+            textEvolve.text = "Evolve";
+            Debug.Log(finalOutput);
+
+            //get the top 5 candidates from this generations genomes
+            for (int i = 0; i < rawCount; i++)
+            {
+                string scoreNum = "TextScore" + i.ToString();
+                string rawNum = "Raw" + i.ToString();
+                Color[] test = stringToColors(geneticAlgo.Population._genomes[i].genome);
+                RawImage raw = GameObject.Find(rawNum).GetComponent<RawImage>();
+                //Text score = GameObject.Find(scoreNum).GetComponent<Text>();
+                TextureDisplay.applyTexture(test, raw, width, height);
+                //score.text = "Fitness : " + geneticAlgo.Population._fitnesses[i].ToString() + "/64";
+            }
+
+            textGeneration.text = "Generation : " + geneticAlgo.Population._generation.ToString();
+
+        } 
+        else if (enable && geneticAlgo.Population._bestFitness == 64 && Time.frameCount < 10000)
+
+        {
+            for (int i = 0; i < 5; i++)
+            {
+                if (geneticAlgo.Population._fitnesses[i] == 64) {
+
+                string scoreNum = "TextScore" + i.ToString();
+                Text score = GameObject.Find(scoreNum).GetComponent<Text>();
+                score.text = "Evolved!";
+            }
+            }
+        }
+    }
+
+    //update function for user selection based algorithm
+    public void UpdateUser(){
+    
+      if (enable)
         {
             string finalOutput = "";
             finalOutput = geneticAlgo.ToString();
@@ -159,7 +213,7 @@ public class Main : MonoBehaviour {
             textEvolve.text = "Evolve";
             Debug.Log(finalOutput);
 
-            //get the top 5 candidates from this generations genomes
+            //get the first 5 candidates from this generations genomes
             for (int i = 0; i < 5; i++)
             {
                 string scoreNum = "TextScore" + i.ToString();
@@ -168,27 +222,16 @@ public class Main : MonoBehaviour {
                 RawImage raw = GameObject.Find(rawNum).GetComponent<RawImage>();
                 Text score = GameObject.Find(scoreNum).GetComponent<Text>();
                 TextureDisplay.applyTexture(test, raw, width, height);
-                //score.text = "Fitness : " + geneticAlgo.Population._fitnesses[i].ToString() + "/64";
-
             }
-
             textGeneration.text = "Generation : " + geneticAlgo.Population._generation.ToString();
-
         } 
-        //else if (enable && geneticAlgo.Population._bestFitness == 64 && Time.frameCount < 10000)
-
-        //{
-        //    for (int i = 0; i < 5; i++)
-        //    {
-        //        if (geneticAlgo.Population._fitnesses[i] == 64) {
-
-        //        string scoreNum = "TextScore" + i.ToString();
-        //        Text score = GameObject.Find(scoreNum).GetComponent<Text>();
-        //        score.text = "Evolved!";
-        //    }
-        //    }
-        //}
+   
     }
+
+
+
+
+
 }
 
 
