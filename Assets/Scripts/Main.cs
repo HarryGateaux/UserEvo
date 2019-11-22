@@ -6,7 +6,6 @@ using UnityEngine.EventSystems;
 using System.Linq;
 
 
-
 public class Main : MonoBehaviour {
 
     private int noiseCount;
@@ -19,7 +18,7 @@ public class Main : MonoBehaviour {
     public int height;
     public int rawCount = 20;
 
-    public bool enable;
+    public bool enable, validChoice;
 
     // Use this for initialization
     void Awake () {
@@ -41,19 +40,33 @@ public class Main : MonoBehaviour {
 
         textReset.text = "Reset";
 
+
+        //currently my images take  values 0.0, 0.1, ...... 0.9
+        //i should remap these numbers to a letters from a to...
+
+        //sets the last random image as the target image for now.....
+
+        System.Random r = new System.Random(Time.frameCount);
+        string target = colorsToString(TextureNoise.CreateNoise(width, height, r));
+
+        GetInput();
+        startEvo(target);
+
+        
         //holds the candidate images
         noiseCount = 20;
         images = new Color[noiseCount][];
 
-        for (int i = 0; i < noiseCount; i++)
-        {
-            System.Random r = new System.Random(i + Time.frameCount);
-            images[i] = TextureNoise.CreateNoise(width, height, r);
-        }
+        //for (int i = 0; i < noiseCount; i++)
+        //{
+        //    System.Random r = new System.Random(i + Time.frameCount);
+        //    images[i] = TextureNoise.CreateNoise(width, height, r);
+        //}
         //applies the images to the rawImages in GUI and add click handler to raw images
         for (int i = 0; i < rawCount; i++)
         {
-            TextureDisplay.applyTexture(images[i], rawImages[i], width, height);
+            Color[] test = stringToColors(geneticAlgo.Population._genomes[i].genome);
+            TextureDisplay.applyTexture(test, rawImages[i], width, height);
             rawImages[i].gameObject.AddComponent<Button>();
             Button btn = rawImages[i].gameObject.GetComponent<Button>();
             string txt = rawImages[i].gameObject.name;
@@ -69,13 +82,7 @@ public class Main : MonoBehaviour {
         //RawImage rawTarget = GameObject.Find("RawTarget").GetComponent<RawImage>();
         //TextureDisplay.applyTexture(images[noiseCount - 1], rawTarget, width, height);
 
-        //currently my images take  values 0.0, 0.1, ...... 0.9
-        //i should remap these numbers to a letters from a to...
 
-        //sets the last random image as the target image for now.....
-        string target = colorsToString(images[noiseCount - 1]);
-        GetInput();
-        startEvo(target);
 
         //need to draw the images after the initial population has been generated
 
@@ -163,6 +170,8 @@ public class Main : MonoBehaviour {
         enable = false;
         geneticAlgo = null;
         textReset.text = " <---- Press";
+        Run();
+        textGeneration.text = "Generation : " + geneticAlgo.Population._generation.ToString();
     }
 
     //button to quit app
@@ -172,6 +181,15 @@ public class Main : MonoBehaviour {
 
     public void GetInput(){
         inputSelection = iField.text;
+        validChoice = true;
+
+        if (iField.text.Split(' ').Length < 5)
+        {
+            validChoice = false;
+            enable = false;
+            Debug.Log("Must select 5 candidates");
+            textEvolve.text = "Evolve";
+        }
     }
 
     // Update is called once per frame
@@ -190,15 +208,16 @@ public class Main : MonoBehaviour {
     //update function for user selection based algorithm
     public void UpdateUser()
     {
-
-        if (enable)
+        GetInput();
+        if (enable && validChoice)
         {
-            GetInput();
+
             string finalOutput = "";
             finalOutput = geneticAlgo.ToString();
             geneticAlgo.NextGeneration(inputSelection);
             enable = false; //pausing the simulation to get new data
             textEvolve.text = "Evolve";
+            iField.text = "";
             Debug.Log(finalOutput);
 
             //get the first 5 candidates from this generations genomes

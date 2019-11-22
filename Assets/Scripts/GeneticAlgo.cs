@@ -433,6 +433,9 @@ public class GeneticAlgo
         //make genome more generic, and specifiable
         //sort out GUI , 20 items
         //in god mode the user acts as the fitness function, so we don't need a fitness.
+        //tidy up the Main.cs a lot
+        //figure out the genome implementation
+
         if (!(_selection._selectionType == "god mode"))
         {
             _fitness.Apply(Population);
