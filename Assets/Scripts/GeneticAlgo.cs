@@ -395,22 +395,21 @@ public class Mutation
 
 public class GeneticAlgo
 {
+    private Population _population;
     private Fitness _fitness;
-
+    private Selection _selection;
     private CrossOver _crossover;
     private Mutation _mutation;
     public string _name;
 
-    private Population _population;
-    public Population Population
-    {
+    public Boolean Stopped { get; set; }
+
+    public Population Population    {
         get  {return _population;}
         set  {_population = value;}
     }
 
-    private Selection _selection;
-        public Selection Selection
-    {
+        public Selection Selection    {
         get  {return _selection;}
         set  {_selection = value;}
     }
@@ -433,8 +432,9 @@ public class GeneticAlgo
         //make genome more generic, and specifiable
         //sort out GUI , 20 items
         //in god mode the user acts as the fitness function, so we don't need a fitness.
-        //tidy up the Main.cs a lot
-        //figure out the genome implementation
+        //move the conversion into the genome
+        //sort out the display phenotypes bit
+
 
         if (!(_selection._selectionType == "god mode"))
         {
