@@ -3,6 +3,47 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+//this interface must be implemented to convert from genome strings to phenotypes
+interface IEncoder<T>
+{
+    string Encode(T[] obj);
+    T[] Decode(string genomeString);
+}
+
+//converts from a Color to string based genome
+public class Encoder : IEncoder<Color>
+{
+    public string Encode(Color[] pixels)
+    {
+        char[] chars = new char[pixels.Length];
+
+        for (int i = 0; i < pixels.Length; i++)
+        {
+            chars[i] = (char)(pixels[i].r * 10 + 97);
+        }
+
+        string output = new string(chars);
+
+        Debug.Log("target string is " + output);
+
+        return output;
+    }
+
+    public Color[] Decode(string genomeString)
+    {
+        Color[] colors = new Color[genomeString.Length];
+        char[] chars = genomeString.ToCharArray();
+
+        for (int i = 0; i < genomeString.Length; i++)
+        {
+            float colorW = (chars[i] - 97) / 10f;
+            colors[i] = new Color(colorW, colorW, colorW);
+        }
+
+        return colors;
+    }
+}
+
 public class Population
 {
     public string _name;
@@ -128,7 +169,7 @@ public class Selection
     }
 
 
-    
+
     //returns an array with frequency of the top 3 fitnesses weighted by occurence i.e cdf
     public List<Genome> Select(Population p, string userSelection = "")
     {
@@ -152,7 +193,7 @@ public class Selection
                 //must have 5 selections.....
                 for (int i = 0; i < 5; i++)
                 {
-                    Debug.Log("User chose Genome " + indices[i] + "\nGenome : " + p._genomes[int.Parse(indices[i])].ToString());
+                    Debug.Log("User chose Candidate " + indices[i] + "\nGenome : " + p._genomes[int.Parse(indices[i])].ToString());
 
                     for (int j = 0; j < (size / 5); j++)
                     {
@@ -223,7 +264,6 @@ public class Selection
     }
 }
 
-
 public class CrossOver
 {
     public string _crossoverType;
@@ -250,7 +290,6 @@ public class CrossOver
 
         }
     }
-
 
     //takes two genomes as input and mutates them
     public void Cross(Genome p1, Genome p2)
@@ -317,7 +356,6 @@ public class CrossOver
         }
     }
 }
-
 
 public class Mutation
 {
@@ -394,6 +432,8 @@ public class Mutation
 
 public class GeneticAlgo
 {
+    //private fields
+    private Encoder _encoder;
     private Population _population;
     private Fitness _fitness;
     private Selection _selection;
@@ -401,20 +441,15 @@ public class GeneticAlgo
     private Mutation _mutation;
     public string _name;
 
+    //public properties
+    public Population Population {get {return _population;} set {_population = value;}}
+    public Selection Selection {get {return _selection;} set {_selection = value;}}
+    public Encoder Encoder { get { return _encoder; } set { _encoder = value; } }
     public Boolean Stopped { get; set; }
 
-    public Population Population    {
-        get  {return _population;}
-        set  {_population = value;}
-    }
-
-        public Selection Selection    {
-        get  {return _selection;}
-        set  {_selection = value;}
-    }
-
-    public GeneticAlgo(Fitness fitness, Population population, Selection selection, CrossOver crossover, Mutation mutation)
+    public GeneticAlgo(Encoder encoder, Fitness fitness, Population population, Selection selection, CrossOver crossover, Mutation mutation)
     {
+        Encoder = encoder;
         Population = population;
         _fitness = fitness;
         _selection = selection;
@@ -429,7 +464,6 @@ public class GeneticAlgo
         //targetstring is blank (if selection type is user, don't need a target eh?
         //make genome more generic, and specifiable
         //move the conversion into the genome
-
 
         if (!(_selection._selectionType == "god mode"))
         {

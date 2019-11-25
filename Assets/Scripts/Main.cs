@@ -26,6 +26,7 @@ public class Main : MonoBehaviour {
 
         inputSelection = GameObject.Find("InputSelection").GetComponent<InputField>();
 
+        //configure raw images
         for (int i = 0; i < rawCount; i++)
         {
             //add a button to each image for selection
@@ -49,11 +50,9 @@ public class Main : MonoBehaviour {
         width = 8;
         height = 8;
 
-        System.Random r = new System.Random(Time.frameCount);
-        string target = colorsToString(TextureNoise.CreateNoise(width, height, r));
 
         GetUserSelection();
-        CreateGA(target);
+        CreateGA();
         DisplayPhenotypes(rawCount);
 
         textEvolve.text = "Evolve";
@@ -67,57 +66,61 @@ public class Main : MonoBehaviour {
         for (int i = 0; i < count; i++)
         {
             //convert initial genomes to images
-            Color[] specimen = stringToColors(geneticAlgo.Population._genomes[i].genome);
+            Color[] specimen = geneticAlgo.Encoder.Decode(geneticAlgo.Population._genomes[i].genome);
             TextureDisplay.applyTexture(specimen, rawImages[i], width, height);
         }
     }
 
-    public void CreateGA(string target)
+    public void CreateGA()
     {
+        System.Random r = new System.Random(Time.frameCount);
+
         string selectType = "god mode";
         string mutateType = "randomChoice";
         string crossType = "OnePt";
 
+        Encoder encoder = new Encoder();
+        string target = encoder.Encode(TextureNoise.CreateNoise(width, height, r));
         Fitness fitness = new Fitness(target);
         Population population = new Population(20, fitness._targetString) { _name = "images" };
         Selection selection = new Selection(selectType);
         CrossOver crossover = new CrossOver(crossType);
         Mutation mutation = new Mutation(mutateType);
 
-        geneticAlgo = new GeneticAlgo(fitness, population, selection, crossover, mutation);
+        geneticAlgo = new GeneticAlgo(encoder, fitness, population, selection, crossover, mutation);
     }
 
-    //encodes the color to a string genome
-    public string colorsToString(Color[] pixels)
-    {
-        char[] chars = new char[pixels.Length];
+    ////encodes the color to a string genome
+    //public string colorsToString(Color[] pixels)
+    //{
+    //    char[] chars = new char[pixels.Length];
 
-        for (int i = 0; i < pixels.Length; i++)
-        {
-            chars[i] = (char)(pixels[i].r * 10 + 97);
-        }
+    //    for (int i = 0; i < pixels.Length; i++)
+    //    {
+    //        chars[i] = (char)(pixels[i].r * 10 + 97);
+    //    }
 
-        string output = new string(chars);
+    //    string output = new string(chars);
 
-        Debug.Log("target string is " + output);
+    //    Debug.Log("target string is " + output);
 
-        return output;
-    }
+    //    return output;
+    //}
 
     //decodes of a string genome to a color
-    public Color[] stringToColors(string guess)
-    {
-        Color[] colors = new Color[guess.Length];
-        char[] chars = guess.ToCharArray();
+    //public Color[] stringToColors(string guess)
+    //{
+    //    Color[] colors = new Color[guess.Length];
+    //    char[] chars = guess.ToCharArray();
 
-        for (int i = 0; i < guess.Length; i++)
-        {
-            float colorW = (chars[i] - 97) / 10f;
-            colors[i] = new Color(colorW, colorW, colorW);
-        }
+    //    for (int i = 0; i < guess.Length; i++)
+    //    {
+    //        float colorW = (chars[i] - 97) / 10f;
+    //        colors[i] = new Color(colorW, colorW, colorW);
+    //    }
 
-        return colors;
-    }
+    //    return colors;
+    //}
 
     public void OnClickEvolve()
     {

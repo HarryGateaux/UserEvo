@@ -1,5 +1,5 @@
 ﻿using System;
-using UnityEngine;
+
 //represents genome as an array of integers
 public class Genome {
 
@@ -65,5 +65,7 @@ public class Genome {
 		
 		return randNormal;
 	}
-
 }
+
+
+
