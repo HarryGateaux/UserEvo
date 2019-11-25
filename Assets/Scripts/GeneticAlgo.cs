@@ -130,7 +130,7 @@ public class Selection
 
     
     //returns an array with frequency of the top 3 fitnesses weighted by occurence i.e cdf
-    public List<Genome> Select(Population p, string userSelection)
+    public List<Genome> Select(Population p, string userSelection = "")
     {
         //local variables
 
@@ -148,7 +148,6 @@ public class Selection
                 Debug.Log("Please choose the candidates selected to be the parents");
                 Debug.Log("Type 5 numbers between 0 and " + (p._size - 1).ToString());
                 string[] indices = userSelection.Split(' ');
-                Debug.Log(indices.Length);
 
                 //must have 5 selections.....
                 for (int i = 0; i < 5; i++)
@@ -425,15 +424,11 @@ public class GeneticAlgo
 
     public void NextGeneration(string userSelection = "")
     {
-        //at the end of each run the  user selects N items
-        //this is then passed to the selection
         //should i save each generation in the population object
-        //targetstring is blank
+        
+        //targetstring is blank (if selection type is user, don't need a target eh?
         //make genome more generic, and specifiable
-        //sort out GUI , 20 items
-        //in god mode the user acts as the fitness function, so we don't need a fitness.
         //move the conversion into the genome
-        //sort out the display phenotypes bit
 
 
         if (!(_selection._selectionType == "god mode"))
@@ -445,6 +440,8 @@ public class GeneticAlgo
         _crossover.Apply(Population, parentSelection);
         _mutation.Apply(Population);
         Population._generation++;
+
+        Debug.Log(this.ToString());
     }
 
     public override string ToString()

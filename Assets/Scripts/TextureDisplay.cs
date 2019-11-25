@@ -9,7 +9,6 @@ public static class TextureDisplay {
     public static void applyTexture(Color[] colorMap, RawImage raw, int w, int h) {
 
         Texture2D texture = new Texture2D(w, h);
-        Debug.Log(w.ToString() + " " + h.ToString() + " " + colorMap.Length.ToString());
         texture.SetPixels(colorMap);
         texture.filterMode = FilterMode.Point;
         texture.Apply();

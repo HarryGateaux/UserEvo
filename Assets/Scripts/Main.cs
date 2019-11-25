@@ -12,7 +12,7 @@ public class Main : MonoBehaviour {
     public int height;
     public int rawCount = 20;
 
-    public bool enable, validChoice;
+    public bool enable, validSelection;
 
     // Use this for initialization
     void Awake () {
@@ -71,7 +71,6 @@ public class Main : MonoBehaviour {
             TextureDisplay.applyTexture(specimen, rawImages[i], width, height);
         }
     }
-
 
     public void CreateGA(string target)
     {
@@ -161,15 +160,23 @@ public class Main : MonoBehaviour {
     }
 
     public void GetUserSelection(){
-        validChoice = true;
+        validSelection = true;
 
         if (inputSelection.text.Split(' ').Length < 5)
         {
-            validChoice = false;
+            validSelection = false;
             enable = false;
             Debug.Log("Must select 5 candidates");
             textEvolve.text = "Evolve";
         }
+    }
+
+    public void NextGeneration()
+    {
+        geneticAlgo.NextGeneration(inputSelection.text);
+        textEvolve.text = "Evolve";
+        DisplayPhenotypes(rawCount);
+        textGeneration.text = "Generation : " + geneticAlgo.Population._generation.ToString();
     }
 
     // Update is called once per frame
@@ -190,63 +197,23 @@ public class Main : MonoBehaviour {
     {
         GetUserSelection();
         
-        if (enable && validChoice)
+        if (enable && validSelection)
         {
-            string finalOutput = "";
-            finalOutput = geneticAlgo.ToString();
-            geneticAlgo.NextGeneration(inputSelection.text);
+            NextGeneration();
+
             enable = false; //pausing the simulation to get new data
-            textEvolve.text = "Evolve";
             inputSelection.text = "";
-            Debug.Log(finalOutput);
-
-            //get the first 5 candidates from this generations genomes
-            //for (int i = 0; i < rawCount; i++)
-            //{
-            //    string scoreNum = "TextScore" + i.ToString();
-            //    string rawNum = "Raw" + i.ToString();
-            //    Color[] test = stringToColors(geneticAlgo.Population._genomes[i].genome);
-            //    RawImage raw = GameObject.Find(rawNum).GetComponent<RawImage>();
-            //    //Text score = GameObject.Find(scoreNum).GetComponent<Text>();
-            //    TextureDisplay.applyTexture(test, raw, width, height);
-            //}
-
-            DisplayPhenotypes(rawCount);
-                                          
-            textGeneration.text = "Generation : " + geneticAlgo.Population._generation.ToString();
         }
-
     }
 
     //update function for fitness based algorithm
     public void UpdateFitness(){
     
-        if (enable && geneticAlgo.Population._bestFitness < 64 && Time.frameCount < 10000)
+        if (enable && geneticAlgo.Population._bestFitness < (height * width) && Time.frameCount < 10000)
         {
-            string finalOutput = "";
-            finalOutput = geneticAlgo.ToString();
-            geneticAlgo.NextGeneration(inputSelection.text);
-            textEvolve.text = "Evolve";
-            Debug.Log(finalOutput);
-
-            //get the top 5 candidates from this generations genomes
-            //for (int i = 0; i < rawCount; i++)
-            //{
-            //    string scoreNum = "TextScore" + i.ToString();
-            //    string rawNum = "Raw" + i.ToString();
-            //    Color[] test = stringToColors(geneticAlgo.Population._genomes[i].genome);
-            //    RawImage raw = GameObject.Find(rawNum).GetComponent<RawImage>();
-            //    //Text score = GameObject.Find(scoreNum).GetComponent<Text>();
-            //    TextureDisplay.applyTexture(test, raw, width, height);
-            //    //score.text = "Fitness : " + geneticAlgo.Population._fitnesses[i].ToString() + "/64";
-            //}
-
-            DisplayPhenotypes(rawCount);
-            textGeneration.text = "Generation : " + geneticAlgo.Population._generation.ToString();
-
+            NextGeneration();
         } 
-        else if (enable && geneticAlgo.Population._bestFitness == 64 && Time.frameCount < 10000)
-
+        else if (enable && geneticAlgo.Population._bestFitness == 64 && Time.frameCount < 10000) //case where the target is evolved
         {
             for (int i = 0; i < 5; i++)
             {
@@ -255,6 +222,7 @@ public class Main : MonoBehaviour {
                 string scoreNum = "TextScore" + i.ToString();
                 Text score = GameObject.Find(scoreNum).GetComponent<Text>();
                 score.text = "Evolved!";
+                geneticAlgo.Stopped = true;
             }
             }
         }
