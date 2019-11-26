@@ -39,9 +39,7 @@ public class Main : MonoBehaviour {
             cb.pressedColor = new Color(0.2f, 0.2f, 0.2f);
             btn.colors = cb;
         }
-
         Setup();
-    
     }
     
     public void Setup()
@@ -59,16 +57,6 @@ public class Main : MonoBehaviour {
         textReset.text = "Reset";
         textGeneration.text = "Generation : " + geneticAlgo.Population._generation.ToString();
 
-    }
-
-    public void DisplayPhenotypes(int count)
-    {
-        for (int i = 0; i < count; i++)
-        {
-            //convert initial genomes to images
-            Color[] specimen = geneticAlgo.Encoder.Decode(geneticAlgo.Population._genomes[i].genome);
-            TextureDisplay.applyTexture(specimen, rawImages[i], width, height);
-        }
     }
 
     public void CreateGA()
@@ -90,38 +78,7 @@ public class Main : MonoBehaviour {
         geneticAlgo = new GeneticAlgo(encoder, fitness, population, selection, crossover, mutation);
     }
 
-    ////encodes the color to a string genome
-    //public string colorsToString(Color[] pixels)
-    //{
-    //    char[] chars = new char[pixels.Length];
-
-    //    for (int i = 0; i < pixels.Length; i++)
-    //    {
-    //        chars[i] = (char)(pixels[i].r * 10 + 97);
-    //    }
-
-    //    string output = new string(chars);
-
-    //    Debug.Log("target string is " + output);
-
-    //    return output;
-    //}
-
-    //decodes of a string genome to a color
-    //public Color[] stringToColors(string guess)
-    //{
-    //    Color[] colors = new Color[guess.Length];
-    //    char[] chars = guess.ToCharArray();
-
-    //    for (int i = 0; i < guess.Length; i++)
-    //    {
-    //        float colorW = (chars[i] - 97) / 10f;
-    //        colors[i] = new Color(colorW, colorW, colorW);
-    //    }
-
-    //    return colors;
-    //}
-
+    #region OnClick Functionality
     public void OnClickEvolve()
     {
 
@@ -161,6 +118,7 @@ public class Main : MonoBehaviour {
         string[] checkedInputs = inputs.Length > 5 ? inputs.Take(5).ToArray() : inputs;
         inputSelection.text = string.Join(" ", checkedInputs);
     }
+    #endregion
 
     public void GetUserSelection(){
         validSelection = true;
@@ -180,6 +138,16 @@ public class Main : MonoBehaviour {
         textEvolve.text = "Evolve";
         DisplayPhenotypes(rawCount);
         textGeneration.text = "Generation : " + geneticAlgo.Population._generation.ToString();
+    }
+
+    public void DisplayPhenotypes(int count)
+    {
+        for (int i = 0; i < count; i++)
+        {
+            //convert initial genomes to images
+            Color[] specimen = geneticAlgo.Encoder.Decode(geneticAlgo.Population._genomes[i].genome);
+            TextureDisplay.applyTexture(specimen, rawImages[i], width, height);
+        }
     }
 
     // Update is called once per frame

@@ -4,6 +4,7 @@ using System.Linq;
 using UnityEngine;
 
 //this interface must be implemented to convert from genome strings to phenotypes
+//T is the type that the phenotype is represented by
 interface IEncoder<T>
 {
     string Encode(T[] obj);
@@ -444,7 +445,7 @@ public class GeneticAlgo
     //public properties
     public Population Population {get {return _population;} set {_population = value;}}
     public Selection Selection {get {return _selection;} set {_selection = value;}}
-    public Encoder Encoder { get { return _encoder; } set { _encoder = value; } }
+    public Encoder Encoder { get { return _encoder;} set {_encoder = value;}}
     public Boolean Stopped { get; set; }
 
     public GeneticAlgo(Encoder encoder, Fitness fitness, Population population, Selection selection, CrossOver crossover, Mutation mutation)
@@ -463,7 +464,17 @@ public class GeneticAlgo
         
         //targetstring is blank (if selection type is user, don't need a target eh?
         //make genome more generic, and specifiable
-        //move the conversion into the genome
+
+        //currently the targetstring is defining the length of the seeded genomes. That's not ideal.
+
+        //I should specify the seeding information in the encoder....
+
+        //how do I deal with variable length genomes???? This matters in crossover, fitness, and seeding the population
+        //for the next step only need to focus on crossover and seeding.
+      
+        //need to be able to seed a population from a list of values
+
+        //stop using all the letters a - z?
 
         if (!(_selection._selectionType == "god mode"))
         {

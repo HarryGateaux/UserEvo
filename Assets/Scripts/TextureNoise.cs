@@ -4,7 +4,6 @@ using UnityEngine;
 
 //generates the a random noise map for the textures
 public class TextureNoise {
-
     public static Color[] CreateNoise(int w, int h, System.Random r)
     {
    
